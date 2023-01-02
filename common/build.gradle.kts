@@ -18,6 +18,9 @@ kotlin {
                 api(compose.material)
                 // Needed only for preview.
                 implementation(compose.preview)
+
+                implementation("io.ktor:ktor-client-core:2.2.1")
+                implementation("io.ktor:ktor-client-cio:2.2.1")
             }
         }
         named("androidMain") {
@@ -32,15 +35,6 @@ kotlin {
 android {
     compileSdk = 33
 
-    defaultConfig {
-        minSdk = 23
-        targetSdk = 33
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
 
     sourceSets {
         named("main") {
@@ -49,7 +43,4 @@ android {
         }
     }
   namespace = "com.myapplication.common"
-}
-dependencies {
-    implementation("io.ktor:ktor-client-core:2.2.1")
 }

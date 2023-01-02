@@ -13,6 +13,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import utils.Utils
 
 @Composable
 fun App() {
@@ -34,12 +35,10 @@ fun App() {
 
 @Composable
 private fun Screen() {
-    var text by remember { mutableStateOf("Hello, World!") }
-
     Button(onClick = {
-        text = "Hi mom"
+        Utils.downloadUrl()
     }) {
-        Text(text)
+        Text("download")
     }
 }
 
