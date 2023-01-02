@@ -1,7 +1,3 @@
-# bilibiliDownloader
-kotline compose and okhttp
+# youtubeDownloader
 
-screenshot application
-![image](bilibili.png)
-
-this app is example how to create application, with android compose, coroutine, okhttp
+jbcompose and ktor
