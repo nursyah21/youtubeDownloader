@@ -18,9 +18,9 @@ kotlin {
                 api(compose.material)
                 // Needed only for preview.
                 implementation(compose.preview)
-
                 implementation("io.ktor:ktor-client-core:2.2.1")
                 implementation("io.ktor:ktor-client-cio:2.2.1")
+                implementation("com.github.TeamNewPipe:NewPipeExtractor:master-SNAPSHOT")
             }
         }
         named("androidMain") {
