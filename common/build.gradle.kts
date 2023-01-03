@@ -21,6 +21,7 @@ kotlin {
                 implementation("io.ktor:ktor-client-core:2.2.1")
                 implementation("io.ktor:ktor-client-cio:2.2.1")
                 implementation("com.github.TeamNewPipe:NewPipeExtractor:master-SNAPSHOT")
+                implementation("org.python:jython-slim:2.7.3")
             }
         }
         named("androidMain") {
