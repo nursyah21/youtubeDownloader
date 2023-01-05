@@ -33,5 +33,6 @@ android {
 dependencies {
     implementation(project(":common"))
     implementation("androidx.activity:activity-compose:1.6.1")
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.0")
+  implementation("androidx.core:core-ktx:+")
+  coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.0")
 }

@@ -1,4 +1,4 @@
-package utils
+package com.nursyah.utils
 
 data class DataUrl(
   val url: String,

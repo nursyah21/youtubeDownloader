@@ -1,8 +1,7 @@
-package screen
+package com.nursyah.screen
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -12,13 +11,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.grack.nanojson.JsonObject
-import com.grack.nanojson.JsonParser
+import com.nursyah.openLink
+import com.nursyah.utils.Utils
 import kotlinx.coroutines.launch
-import org.python.util.PythonInterpreter
-import utils.DataDownloader
-import utils.Utils
-import java.awt.TextArea
+import java.io.File
 
 @Composable
 fun typography() =
@@ -50,11 +46,13 @@ fun App() {
 
 @Composable
 private fun Screen() {
-    var link by remember { mutableStateOf("https://www.youtube.com/watch?v=puZ4gdj1OD0") }
+    var link by remember { mutableStateOf("https://www.youtube.com/watch?v=86IxCGKUOzY") }
     var load by remember { mutableStateOf(false) }
     var data by remember { mutableStateOf("") }
     var title by remember { mutableStateOf("") }
     var newData by remember { mutableStateOf(null) }
+    var listLink = remember { mutableListOf<String>() }
+
 
     Text("input link youtube")
 
@@ -68,9 +66,11 @@ private fun Screen() {
     Button(onClick = {
         scope.launch{
             data = ""
+            listLink.clear()
             load = true
             Utils.downloadData(link).forEach {
                 data += it.url + "\n\n"
+                listLink.add(it.url)
             }
             load = false
         }
@@ -91,26 +91,37 @@ private fun Screen() {
     Column(
         modifier = Modifier.height(400.dp).verticalScroll(scrollState)
     ) {
-        TextField(
-            value = data,
-            onValueChange = {data = it},
-            readOnly = true
-        )
-    }
-
-
-
-    //test()
-}
-
-private fun test(){
-    var t = listOf(
-        hashMapOf("as" to "1", "ba" to "2", "ca" to 3, "da" to 5)
-    )
-    t.forEach {
-        if (it["ba"] != null) {
-            println(it["ba"])
-            return
+        listLink.forEach {
+            Button(
+                onClick = { openLink(it) },
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = Color(0xFFAA0000)
+                ),
+                modifier = Modifier.fillMaxWidth()
+            ){
+                Text("Download")
+            }
         }
     }
+
+    mytest()
+
+}
+
+fun mytest() {
+    val i = """cacqw.get("n"))&&(b=dta[0](b),a.set("n",b),dta.length||Tla(""))}};
+eta=function(a){nD(a);var b=a.B+(a.B?"://":"//")+a.C+cqwcd"""
+    //.get("n"))&&(b=dta[0]
+    val b = """.get\("n"\)\)&&\([a-zA-Z0-9_$]=([a-zA-Z0-9${'$'}_]+)\[(\d+)]""".toRegex()
+    val c = b.find(i)?.groups
+    var name = c?.get(1)?.value
+    val j = """asdqwc var dta=[Tla];g.k=g.tD.prototype;g.k.bI=function(a){this.segments.push(a)};"""
+    try {
+        val re = """var ${name}\s*=\[(.+?)];""".toRegex()
+
+    }catch (e:Exception){
+        println(e)
+    }
+
+
 }

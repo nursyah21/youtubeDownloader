@@ -3,7 +3,7 @@ plugins {
     // in each subproject's classloader
     kotlin("jvm") apply false
     kotlin("multiplatform") apply false
-    kotlin("android") apply false
+  kotlin("android") apply false version "1.7.20"
     id("com.android.application") apply false
     id("com.android.library") apply false
     id("org.jetbrains.compose") apply false
