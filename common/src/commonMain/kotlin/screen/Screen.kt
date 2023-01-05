@@ -11,7 +11,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.grack.nanojson.JsonObject
+import com.grack.nanojson.JsonParser
 import kotlinx.coroutines.launch
+import org.python.util.PythonInterpreter
+import utils.DataDownloader
 import utils.Utils
 import java.awt.TextArea
 
@@ -48,6 +53,8 @@ private fun Screen() {
     var link by remember { mutableStateOf("https://www.youtube.com/watch?v=puZ4gdj1OD0") }
     var load by remember { mutableStateOf(false) }
     var data by remember { mutableStateOf("") }
+    var title by remember { mutableStateOf("") }
+    var newData by remember { mutableStateOf(null) }
 
     Text("input link youtube")
 
@@ -62,7 +69,9 @@ private fun Screen() {
         scope.launch{
             data = ""
             load = true
-            data = Utils.downloadData(link)
+            Utils.downloadData(link).forEach {
+                data += it.url + "\n\n"
+            }
             load = false
         }
     }) {
@@ -70,6 +79,13 @@ private fun Screen() {
     }
 
     if(load && data.isBlank()) LinearProgressIndicator()
+
+    if(title.isNotBlank()) {
+        Text(
+            title,
+            fontSize = 18.sp
+        )
+    }
 
     val scrollState = rememberScrollState()
     Column(
@@ -80,10 +96,21 @@ private fun Screen() {
             onValueChange = {data = it},
             readOnly = true
         )
-
-//        SelectionContainer {
-//            Text(data)
-//        }
     }
+
+
+
+    //test()
 }
 
+private fun test(){
+    var t = listOf(
+        hashMapOf("as" to "1", "ba" to "2", "ca" to 3, "da" to 5)
+    )
+    t.forEach {
+        if (it["ba"] != null) {
+            println(it["ba"])
+            return
+        }
+    }
+}
