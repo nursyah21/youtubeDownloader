@@ -7,9 +7,9 @@ import io.ktor.client.call.body
 import io.ktor.client.plugins.onDownload
 import io.ktor.client.request.get
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flow
 
 class Youtube{
@@ -25,30 +25,37 @@ class Youtube{
     }
 }
 
-var statusDownload1 = MutableStateFlow("")
-var statusDownload = ""
+var statusDownload by mutableStateOf("")
+var download by mutableStateOf(false)
 
-suspend fun downloadData1(url: String) {
-    (1..10).forEach{
-        statusDownload1.value = it.toString()
-        delay(1000)
-        println(it)
-    }
-}
-
-fun status(): Flow<String> = flow<String> {
-    (1..10).forEach{
-//        statusDownload = it.toString()
-        emit(it.toString())
-        println(it)
-        delay(1000)
-    }
-}
 /**
  * download data with status progress
  *
  * */
-fun downloadData(
+fun downloadData(url: String) = channelFlow<String>{
+    try{
+        send("download data")
+        val response = HttpClient().get(url){
+            onDownload{ bytesSentTotal, contentLength ->
+                val tempData = if(contentLength > 0) "Received $bytesSentTotal bytes from $contentLength"
+                else "Received $bytesSentTotal bytes"
+                send(tempData)
+            }
+        }
+        send("success download data")
+        val responseBody = response.body<String>()
+        println(responseBody)
+    }catch (e:Exception) {
+        println(e)
+        send("error Download data")
+    }
+}
+
+/**
+ * download data with status progress
+ *
+ * */
+fun downloadData1(
     url: String
 ) = flow<String> {
     try{
@@ -60,10 +67,11 @@ fun downloadData(
                 println(statusDownload)
             }
         }
-
         val responseBody = response.body<String>()
         println(responseBody)
     }catch (e:Exception){
+        emit("Error download data")
         println(e)
     }
+
 }

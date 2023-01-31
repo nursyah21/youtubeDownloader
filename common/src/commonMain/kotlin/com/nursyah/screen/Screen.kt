@@ -3,42 +3,22 @@ package com.nursyah.screen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.AppBarDefaults
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -49,21 +29,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.nursyah.openLink
-import com.nursyah.utils.MyData
-import com.nursyah.utils.Utils
+import com.nursyah.utils.download
 import com.nursyah.utils.downloadData
-import com.nursyah.utils.statusDownload
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 
 @Composable
 fun typography() =
@@ -94,13 +63,23 @@ fun App() {
 }
 
 
-var st = mutableStateOf(false)
+
+var search by mutableStateOf("")
 @Composable
 private fun TempScreen(){
-    var search by remember { mutableStateOf("") }
-    var status by remember { mutableStateOf("") }
+    SearchBar(
+        search,
+        onDone = {
+            download = !download
+        }
+    ) {search = it}
 
-    SearchBar(search) {search = it}
+    StatusDownload()
+}
+
+@Composable
+private fun StatusDownload(){
+    var status by remember { mutableStateOf("") }
 
     Text(
         status,
@@ -108,19 +87,10 @@ private fun TempScreen(){
         fontSize = 12.sp
     )
 
-    LaunchedEffect(st){
-        downloadData().collect{status = it}
-        println(st)
+    LaunchedEffect(download){
+        if(search.isNotEmpty()) downloadData(search).collect{status = it}
     }
 }
-
-private fun downloadData() = flow<String>{
-    (1..10).forEach {
-        emit(it.toString())
-        delay(500)
-    }
-}
-
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -147,161 +117,6 @@ private fun SearchBar(
             Text("link youtube", color = Color.White.copy(alpha = .7f))
         }
     )
-}
-
-@Composable
-private fun Screen() {
-    var link by remember { mutableStateOf("https://www.youtube.com/watch?v=86IxCGKUOzY") }
-    var load by remember { mutableStateOf(false) }
-    var data by remember { mutableStateOf("") }
-    var title by remember { mutableStateOf("") }
-    var newData by remember { mutableStateOf(null) }
-    var listLink = remember { mutableListOf<String>() }
-    val myDataClass = MyData()
-    var myData = myDataClass.myData
-
-    Text("input link youtube")
-
-    TextField(
-        value = link,
-        onValueChange = {link = it},
-        singleLine = true
-    )
-
-    val scope = rememberCoroutineScope()
-    var test2 = MutableStateFlow("")
-
-    runBlocking {
-        //test2 = "null"
-        launch {
-            //MyData().dataFlow().collect{test2 = it}
-        }
-    }
-
-    //Text(test2)
-    //var mytest = MyData().dataFlow().collect{ it }
-
-    Button(onClick = {
-        scope.launch{
-            myDataClass.myData()
-            data = ""
-            listLink.clear()
-            load = true
-            Utils.downloadData(link).forEach {
-                data += it.url + "\n\n"
-                listLink.add(it.url)
-            }
-            load = false
-        }
-    }) {
-        Text("download")
-    }
-
-    Text(myData)
-
-    if(load && data.isBlank()) LinearProgressIndicator()
-
-    if(title.isNotBlank()) {
-        Text(
-            title,
-            fontSize = 18.sp
-        )
-    }
-
-    val scrollState = rememberScrollState()
-    Column(
-        modifier = Modifier.height(400.dp).verticalScroll(scrollState)
-    ) {
-        listLink.forEach {
-            Button(
-                onClick = { openLink(it) },
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color(0xFFAA0000)
-                ),
-                modifier = Modifier.fillMaxWidth()
-            ){
-                Text("Download")
-            }
-        }
-    }
-
-}
-
-@Composable
-fun SearchAppBar(
-    text: String,
-    onTextChange: (String) -> Unit,
-    onCloseClicked: () -> Unit,
-    onSearchClicked: (String) -> Unit,
-) {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp),
-        elevation = AppBarDefaults.TopAppBarElevation,
-        color = MaterialTheme.colors.primary
-    ) {
-        TextField(modifier = Modifier
-            .fillMaxWidth(),
-            value = text,
-            onValueChange = {
-                onTextChange(it)
-            },
-            placeholder = {
-                Text(
-                    modifier = Modifier
-                        .alpha(ContentAlpha.medium),
-                    text = "Search here...",
-                    color = Color.White
-                )
-            },
-            textStyle = TextStyle(
-                fontSize = MaterialTheme.typography.subtitle1.fontSize
-            ),
-            singleLine = true,
-            leadingIcon = {
-                IconButton(
-                    modifier = Modifier
-                        .alpha(ContentAlpha.medium),
-                    onClick = {}
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search Icon",
-                        tint = Color.White
-                    )
-                }
-            },
-            trailingIcon = {
-                IconButton(
-                    onClick = {
-                        if (text.isNotEmpty()) {
-                            onTextChange("")
-                        } else {
-                            onCloseClicked()
-                        }
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Close Icon",
-                        tint = Color.White
-                    )
-                }
-            },
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Search
-            ),
-            keyboardActions = KeyboardActions(
-                onSearch = {
-                    onSearchClicked(text)
-                }
-            ),
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.Transparent,
-                cursorColor = Color.White.copy(alpha = ContentAlpha.medium)
-            ))
-    }
 }
 
 
