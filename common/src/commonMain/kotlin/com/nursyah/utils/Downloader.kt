@@ -33,6 +33,7 @@ object Utils{
     val client = HttpClient()
     val listData = mutableSetOf<DataUrl>()
 
+    return emptySet()
     return try {
       var res: String = downloadHtml(client, url)
 
@@ -126,51 +127,28 @@ object Utils{
       // get funcName
       val patternFuncName = """.get\("n"\)\)&&\([a-zA-Z\d_$]=([a-zA-Z\d${'$'}_]+)\[(\d+)]"""
         .toRegex().find(dataJs)?.groups
-
       var funcName = patternFuncName?.get(1)?.value
+
       try {
         val numFuncName = patternFuncName?.get(2)?.value?.toInt() ?: 0
         val listFuncName = """var ${funcName}\s*=\[(.+?)];""".toRegex().find(dataJs)?.groups
         funcName = listFuncName?.get(numFuncName+1)?.value
       }catch (_:Exception){}
-      println(funcName)
 
-      //get funcCode
-      /*val nParamPattern = "[&?]n=([^&]+)".toPattern()
-      val decryptFunctionNamePattern =
-        "\\.get\\(\"n\"\\)\\)&&\\([a-zA-Z0-9_$]=([a-zA-Z0-9_$]+)(?:\\[(\\d+)])?\\([a-zA-Z0-9_$]\\)".toPattern()
-      val dech2 = "\\.get\\(\"n\"\\)\\)&&\\([a-zA-Z0-9_$]=([a-zA-Z0-9_\$]+)(?:\\[(\\d+)])?\\([a-zA-Z0-9_\$]\\)".toPattern()
-      val dech3 = Pattern.compile("\\.get\\(\"n\"\\)\\)&&\\([a-zA-Z0-9_$]=([a-zA-Z0-9_$]+)(?:\\[(\\d+)])?\\([a-zA-Z0-9_$]\\)")
-      val decryptFunctionBodyRegex = 
-        "=\\s*function([\\S\\s]*?\\}\\s*return [\\w$]+?\\.join\\(\"\"\\)\\s*\\};)".toPattern()
-      println(dataJs.length)
-      println(dech3.matcher(dataJs).group(1))*/
+      // get funcCode
+      val patternFuncCode =
+        "${funcName}=\\s*function([\\S\\s]*?\\}\\s*return [\\w${'$'}]+?\\.join\\(\"\"\\)\\s*\\};)".toRegex()
+      val funcCode = patternFuncCode.find(dataJs)?.groups?.get(1)?.value
+      println(funcCode)
 
-     /* val decryptFuncName = decryptFunctionNamePattern.matcher(dataJs)
-      println(decryptFuncName)
-      val functionName = decryptFuncName.group(1)
-      println(decryptFuncName)
-
-      val decipherFuncName = if(decryptFuncName.groupCount() == 1) functionName
-      else {
-        val arrNum = decryptFuncName.group(2).toInt()
-        val arrPattern = "var ${Pattern.quote(functionName)}\\s*=\\s*\\[(.*?)];".toPattern()
-        matchGroup1(arrPattern, dataJs).split(",")[arrNum]
-      }*/
-
-      /*try {
-        val test = MyPattern.parseDecodeFunctionName(dataJs)
-        println(test)
-      }catch (e:Exception){println(e)}*/
-      //val dechiper = YoutubeThrottlingDecrypter.
-
-      //println(dataJs)
       data
     }catch (e:Exception){
       println(e)
       ""
     }
   }
+
+
 
   private fun extractItag(s: String): String {
     val fmt = listOf(hashMapOf("as" to "as"))
