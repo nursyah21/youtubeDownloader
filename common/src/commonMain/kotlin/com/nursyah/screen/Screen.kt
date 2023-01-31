@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nursyah.utils.download
 import com.nursyah.utils.downloadData
+import com.nursyah.utils.extractData
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 
@@ -69,12 +70,11 @@ var search by mutableStateOf("")
 private fun TempScreen(){
     SearchBar(
         search,
-        onDone = {
-            download = !download
-        }
+        onDone = { download = !download }
     ) {search = it}
-
     StatusDownload()
+
+    extractData()
 }
 
 @Composable
