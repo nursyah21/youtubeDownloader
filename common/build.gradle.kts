@@ -24,11 +24,13 @@ kotlin {
                 implementation("org.python:jython-slim:2.7.3")
                 implementation("com.grack:nanojson:1.8")
                 implementation("org.jsoup:jsoup:1.15.3")
+                implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+                implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
             }
         }
         named("androidMain") {
             dependencies {
-                api("androidx.appcompat:appcompat:1.5.1")
+                api("androidx.appcompat:appcompat:1.6.0")
                 api("androidx.core:core-ktx:1.9.0")
             }
         }

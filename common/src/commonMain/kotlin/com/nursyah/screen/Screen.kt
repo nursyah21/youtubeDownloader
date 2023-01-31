@@ -1,25 +1,69 @@
 package com.nursyah.screen
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.material.AppBarDefaults
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.ContentAlpha
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nursyah.openLink
 import com.nursyah.utils.MyData
 import com.nursyah.utils.Utils
+import com.nursyah.utils.downloadData
+import com.nursyah.utils.statusDownload
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.schabi.newpipe.extractor.utils.Parser
-import java.io.File
+import kotlinx.coroutines.withContext
 
 @Composable
 fun typography() =
@@ -43,10 +87,66 @@ fun App() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Screen()
+                TempScreen()
             }
         }
     }
+}
+
+
+var st = mutableStateOf(false)
+@Composable
+private fun TempScreen(){
+    var search by remember { mutableStateOf("") }
+    var status by remember { mutableStateOf("") }
+
+    SearchBar(search) {search = it}
+
+    Text(
+        status,
+        color = Color.White.copy(alpha = .7f),
+        fontSize = 12.sp
+    )
+
+    LaunchedEffect(st){
+        downloadData().collect{status = it}
+        println(st)
+    }
+}
+
+private fun downloadData() = flow<String>{
+    (1..10).forEach {
+        emit(it.toString())
+        delay(500)
+    }
+}
+
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun SearchBar(
+    search: String,
+    onDone: ()->Unit = {},
+    onValueChange: (String) -> Unit,
+){
+    OutlinedTextField(
+        value = search,
+        onValueChange = onValueChange,
+        keyboardActions = KeyboardActions(
+            onDone = { println(search) }
+        ),
+        keyboardOptions = KeyboardOptions(
+            imeAction = ImeAction.Done
+        ),
+        singleLine = true,
+        modifier = Modifier.onKeyEvent{
+            if(it.type == KeyEventType.KeyDown && it.key.keyCode == Key.Enter.keyCode)onDone.invoke()
+            false
+        },
+        label = {
+            Text("link youtube", color = Color.White.copy(alpha = .7f))
+        }
+    )
 }
 
 @Composable
@@ -64,7 +164,8 @@ private fun Screen() {
 
     TextField(
         value = link,
-        onValueChange = {link = it}
+        onValueChange = {link = it},
+        singleLine = true
     )
 
     val scope = rememberCoroutineScope()
@@ -125,6 +226,84 @@ private fun Screen() {
     }
 
 }
+
+@Composable
+fun SearchAppBar(
+    text: String,
+    onTextChange: (String) -> Unit,
+    onCloseClicked: () -> Unit,
+    onSearchClicked: (String) -> Unit,
+) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp),
+        elevation = AppBarDefaults.TopAppBarElevation,
+        color = MaterialTheme.colors.primary
+    ) {
+        TextField(modifier = Modifier
+            .fillMaxWidth(),
+            value = text,
+            onValueChange = {
+                onTextChange(it)
+            },
+            placeholder = {
+                Text(
+                    modifier = Modifier
+                        .alpha(ContentAlpha.medium),
+                    text = "Search here...",
+                    color = Color.White
+                )
+            },
+            textStyle = TextStyle(
+                fontSize = MaterialTheme.typography.subtitle1.fontSize
+            ),
+            singleLine = true,
+            leadingIcon = {
+                IconButton(
+                    modifier = Modifier
+                        .alpha(ContentAlpha.medium),
+                    onClick = {}
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = "Search Icon",
+                        tint = Color.White
+                    )
+                }
+            },
+            trailingIcon = {
+                IconButton(
+                    onClick = {
+                        if (text.isNotEmpty()) {
+                            onTextChange("")
+                        } else {
+                            onCloseClicked()
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Close Icon",
+                        tint = Color.White
+                    )
+                }
+            },
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Search
+            ),
+            keyboardActions = KeyboardActions(
+                onSearch = {
+                    onSearchClicked(text)
+                }
+            ),
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = Color.Transparent,
+                cursorColor = Color.White.copy(alpha = ContentAlpha.medium)
+            ))
+    }
+}
+
 
 fun mytest() {
     val i = """g.M.call(this,a)};
