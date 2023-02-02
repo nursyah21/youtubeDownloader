@@ -15,6 +15,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -29,11 +30,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.nursyah.utils.decipherUrl
 import com.nursyah.utils.download
 import com.nursyah.utils.downloadData
-import com.nursyah.utils.extractData
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun typography() =
@@ -73,8 +74,9 @@ private fun TempScreen(){
         onDone = { download = !download }
     ) {search = it}
     StatusDownload()
-
-    extractData()
+    rememberCoroutineScope().launch(Dispatchers.IO) {
+        decipherUrl("asd")
+    }
 }
 
 @Composable
