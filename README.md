@@ -11,7 +11,7 @@
 ### build from source code
 
 ```bash
-    git clone https://github.com/nursyah21/ytdlDesktop.git
-    cd ytdlDesktop
-    ./gradlew packageDistributionForCurrentOS
+git clone https://github.com/nursyah21/ytdlDesktop.git --depth 1
+cd ytdlDesktop
+./gradlew packageDistributionForCurrentOS
 ```
