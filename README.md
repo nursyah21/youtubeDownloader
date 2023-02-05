@@ -2,7 +2,7 @@
 
 ![img](assets/icon.png)
 
-> ytdlDesktop is youtube downloader app, this app can download video youtube and another website like (biliili.com and etc.) build with jetpack compose and ktor. extractor video using [ytdl](https://github.com/ytdl-org/youtube-dl)
+> ytdlDesktop is youtube downloader app, this app can download video youtube and another website like ([bilibili.com](https://www.bilibili.com/) and etc.) build with jetpack compose and ktor. extractor video using [ytdl](https://github.com/ytdl-org/youtube-dl)
 
 ### screenshot application
 
