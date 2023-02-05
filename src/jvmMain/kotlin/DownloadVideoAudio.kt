@@ -16,13 +16,14 @@ suspend fun downloadVideoAudio() {
     val videoExist = dataYt?.videoFormats?.isNotEmpty() == true
     val audioExist = dataYt?.audioFormats?.isNotEmpty() == true
 
-//    if (videoExist && !download("Download video", videoDownload?.url, safeNameVideo))return
-//    if (audioExist && !download("Download audio", audioDownload?.url, safeNameAudio)) return
-//    if (videoExist && audioExist) mergeAudioVideo()
-    if (!download("Download video", videoDownload?.url, safeNameVideo))return
-    if (!download("Download audio", audioDownload?.url, safeNameAudio)) return
-    mergeAudioVideo()
-//    download = false
+    if (videoExist) {
+        if (!download("Download video", videoDownload?.url, safeNameVideo)) return
+    }
+    if (audioExist){
+        if(!download("Download audio", audioDownload?.url, safeNameAudio)) return
+    }
+    if (videoExist && audioExist) mergeAudioVideo()
+    download = false
 }
 
 private fun convertSize(size: Long) = "%.2fmb".format(size.toFloat().div(1048576))
@@ -77,7 +78,6 @@ private suspend fun download(state: String, url: String?, name: String): Boolean
     catch(e: Exception){
         download = false
         status = "fail download $name"
-        //e.printStack()
         Logger.error(e.message)
         false
     }

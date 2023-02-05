@@ -46,42 +46,9 @@ data class DataYt(
 )
 
 
-// environment not include in build gradle
-//private val keyApi = System.getenv("KEY_API")
-//private val webApi = System.getenv("WEB_API")
-
 private val env = Resources.toString(Resources.getResource(".env"), Charsets.UTF_8)
 private val keyApi = env.split("\n")[0].split("=")[1]
 private val webApi = env.split("\n")[1].split("=")[1]
-
-fun test(){
-    val text = Resources.toString(Resources.getResource("test.txt"), Charsets.UTF_8)
-    try {
-        val json = JsonParser.parseString(text).asJsonObject
-        val audioFormats = mutableListOf<FormatYt>()
-        val videoFormats = mutableListOf<FormatYt>()
-        json["formats"].asJsonArray.map { it.asJsonObject }.forEach {
-            val data = FormatYt(
-                id = it["id"].asString,
-                ext = it["ext"].asString,
-                url = it["url"].asString,
-                size = if (it["size"].isJsonNull) 0 else it["size"].asInt,
-            )
-            if(it["id"].asString.contains("audio"))audioFormats.add(data)
-            else if(!it["size"].isJsonNull) videoFormats.add(data)
-        }
-        dataYt = DataYt(
-            json["title"].asString,
-            json["uploader"].asString,
-            json["thumbnail"].asString,
-            audioFormats,
-            videoFormats
-        )
-    }catch (e: Exception){
-        status = "Error extract data"
-        Logger.error(e.message)
-    }
-}
 
 /**
  * download metadata youtube from https://ytdl-7wabejrcqq-uc.a.run.app/youtube

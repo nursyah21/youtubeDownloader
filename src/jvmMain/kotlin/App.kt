@@ -28,8 +28,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
-import com.google.common.base.Charsets
-import com.google.common.io.Resources
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -38,13 +36,13 @@ import java.io.IOException
 
 @Composable
 fun app() {
-    //test()
     Column {
         searchBar()
         youtube()
     }
     bottom()
 }
+
 
 @Composable
 private fun youtube(){
@@ -71,10 +69,12 @@ private fun youtube(){
                     Text("Channel: ${dataYt?.uploader?: ""}")
                 }
             }
-//            if(dataYt?.videoFormats?.isNotEmpty()!!) downloadOption(dataYt?.videoFormats, "Video")
-//            if(dataYt?.audioFormats?.isNotEmpty()!!) downloadOption(dataYt?.audioFormats, "Audio")
-            downloadOption(dataYt?.videoFormats, "Video")
-            downloadOption(dataYt?.audioFormats, "Audio")
+
+            if(dataYt != null){
+                if(dataYt?.videoFormats?.isNotEmpty()!!) downloadOption(dataYt?.videoFormats, "Video")
+                if(dataYt?.audioFormats?.isNotEmpty()!!) downloadOption(dataYt?.audioFormats, "Audio")
+            }
+
             var buttonDownload by remember { mutableStateOf(false) }
 
             buttonDownload = statusProgressDownload.isBlank() ||
@@ -134,8 +134,6 @@ private fun  downloadOption(data: List<FormatYt>?, title: String){
     var selectedText by remember { mutableStateOf(getNameSize(data?.get(0))) }
     val icon = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown
 
-    println(videoDownload)
-    println(audioDownload)
     with(getDataYt(data?.get(0))){
         if(title == "Video" && videoDownload == null) videoDownload = this
         else if(audioDownload == null) audioDownload = this
