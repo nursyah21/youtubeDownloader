@@ -15,3 +15,7 @@ git clone https://github.com/nursyah21/ytdlDesktop.git --depth 1
 cd ytdlDesktop
 ./gradlew packageDistributionForCurrentOS
 ```
+
+### note
+
+> this app still beta, sometimes you will get an error like **failed extract data** or **fail to write file** 

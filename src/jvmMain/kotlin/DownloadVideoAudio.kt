@@ -9,21 +9,25 @@ import org.bytedeco.javacpp.Loader
 import java.io.File
 
 private val dirDownload = File(System.getProperty("user.home"), "Downloads").path
-private val safeNameVideo = videoDownload?.name?.replace("/","-") ?: ""
-private val safeNameAudio = audioDownload?.name?.replace("/","-") ?: ""
+var safeNameVideo = ""
+var safeNameAudio = ""
 
 suspend fun downloadVideoAudio() {
     val videoExist = dataYt?.videoFormats?.isNotEmpty() == true
     val audioExist = dataYt?.audioFormats?.isNotEmpty() == true
+    safeNameVideo = videoDownload?.name?.replace("/","-") ?: ""
+    safeNameAudio = audioDownload?.name?.replace("/","-") ?: ""
 
-    if (videoExist) {
-        if (!download("Download video", videoDownload?.url, safeNameVideo)) return
+    runBlocking {
+        if (videoExist) {
+            if (!download("Download video", videoDownload?.url, safeNameVideo)) return@runBlocking
+        }
+        if (audioExist){
+            if(!download("Download audio", audioDownload?.url, safeNameAudio)) return@runBlocking
+        }
+        if (videoExist && audioExist) mergeAudioVideo()
+        download = false
     }
-    if (audioExist){
-        if(!download("Download audio", audioDownload?.url, safeNameAudio)) return
-    }
-    if (videoExist && audioExist) mergeAudioVideo()
-    download = false
 }
 
 private fun convertSize(size: Long) = "%.2fmb".format(size.toFloat().div(1048576))
@@ -72,8 +76,13 @@ private suspend fun download(state: String, url: String?, name: String): Boolean
             }
         }
         statusProgressDownload = ""
-
-        file.exists()
+        val res = file.exists() && file.length() != 0L
+        if(!res) {
+            if(file.exists())file.delete()
+            download = false
+            status = "fail write file"
+        }
+        res
     }
     catch(e: Exception){
         download = false
@@ -105,27 +114,35 @@ suspend fun mergeAudioVideo(){
         val nameOutput = outputVideoArr[0]
         val fmtAudio = outputAudioArr[outputAudioArr.size -2]
         val fmtVideo = outputVideoArr[outputVideoArr.size -2]
-        val ext = outputVideoArr[outputVideoArr.size -1]
-        val outputFile = File(dirDownload, "$nameOutput.$fmtVideo-$fmtAudio.$ext").path
+        val extAudio = outputAudioArr[outputAudioArr.size -1]
+        val extVideo = outputVideoArr[outputVideoArr.size -1]
+        val ext =
+            if(extAudio == extVideo) extVideo
+            else if(extAudio == "webm" && extVideo == "mp4") "mkv"
+            else extVideo
+
+        val outputFile = File(dirDownload, "$nameOutput.$fmtVideo-$fmtAudio.$ext")
 
         val ffmpeg = Loader.load(org.bytedeco.ffmpeg.ffmpeg::class.java)
         statusProgressDownload = "please wait ..."
         withContext(Dispatchers.IO) {
-            ProcessBuilder(ffmpeg, "-i", video, "-i", audio, "-c:v", "copy","-c:a", "copy", outputFile, "-y").inheritIO()
+            ProcessBuilder(ffmpeg, "-i", video, "-i", audio, "-c:v", "copy","-c:a", "copy", outputFile.path, "-y").inheritIO()
                 .start()
                 .waitFor()
         }
         statusProgressDownload = "success merge audio and video"
         statusProgressDownload = "remove unnecessary file"
         try {
-            File(dirDownload, safeNameVideo).delete()
-            File(dirDownload, safeNameAudio).delete()
+            if(outputFile.exists()){
+                File(dirDownload, safeNameVideo).delete()
+                File(dirDownload, safeNameAudio).delete()
+            }
         }catch (e: Exception){
             Logger.error(e.message)
             statusProgressDownload = "fail remove unnecessary file"
         }
         statusProgressDownload = ""
-        status = outputFile
+        status = outputFile.path
     }catch (e:Exception){
         status = "error merge audio and video"
         Logger.error(e.message)

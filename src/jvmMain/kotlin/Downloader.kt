@@ -56,10 +56,11 @@ private val webApi = env.split("\n")[1].split("=")[1]
  * */
 suspend fun downloadYt(){
     download = true
+    dataYt = null
+    videoDownload = null
+    audioDownload = null
+
     try {
-        dataYt = null
-        videoDownload = null
-        audioDownload = null
         status = "download data"
         val client = HttpClient(CIO)
         val response = client.submitForm(

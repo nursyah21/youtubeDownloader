@@ -109,10 +109,12 @@ private fun youtube(){
                 ){
                     Button(
                         onClick = {
-                          dataYt = null
-                          progressDownload = 0f
-                          statusProgressDownload = ""
-                          status = ""
+                            dataYt = null
+                            progressDownload = 0f
+                            statusProgressDownload = ""
+                            status = ""
+                            videoDownload = null
+                            audioDownload = null
                         },
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = redYt,
