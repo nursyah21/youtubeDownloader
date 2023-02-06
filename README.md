@@ -15,7 +15,7 @@ java min 17
 ```bash
 git clone https://github.com/nursyah21/ytdlDesktop.git --depth 1
 cd ytdlDesktop
-gradle packageDistributionForCurrentOS
+gradle createDistributable
 ```
 
 ### note

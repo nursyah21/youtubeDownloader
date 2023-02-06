@@ -7,8 +7,10 @@ import com.google.common.base.Charsets
 import com.google.common.io.Resources
 import com.google.gson.JsonParser
 import io.ktor.client.*
+import io.ktor.client.engine.apache.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
+import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
@@ -61,22 +63,26 @@ suspend fun downloadYt(){
     audioDownload = null
 
     try {
+        Logger.debug("download data")
         status = "download data"
-        val client = HttpClient(CIO)
-        val response = client.submitForm(
-            url = webApi,
-            formParameters = Parameters.build {
-                append("key", keyApi)
-                append("q", link)
+        val client = HttpClient(Apache){
+            install(Logging){
+                level = LogLevel.INFO
             }
-        ){
-            onDownload {bytes, length ->
+        }
+        val response = client.get("$webApi?key=$keyApi&q=$link"){
+            onDownload{ bytes, length ->
                 status = if(length > 0) "Received $bytes bytes from $length"
                 else "Received $bytes"
             }
         }
+
         status = "download data complete"
+        Logger.debug(response)
         val text = response.bodyAsText()
+        Logger.debug(response.bodyAsText())
+        Logger.debug(text)
+
         status = if (text.contains("Error")) "Error extract data" else ""
         try {
             val json = JsonParser.parseString(text).asJsonObject
