@@ -10,10 +10,12 @@
 
 ### build from source code
 
+java min 17
+
 ```bash
 git clone https://github.com/nursyah21/ytdlDesktop.git --depth 1
 cd ytdlDesktop
-./gradlew packageDistributionForCurrentOS
+gradle packageDistributionForCurrentOS
 ```
 
 ### note

@@ -47,11 +47,12 @@ compose.desktop {
             //WEB_API = ""
 
             val icon = project.file("./src/jvmMain/resources/images/icon.png")
-            linux{
-                iconFile.set(icon)
-
-
-            }
+//            linux{
+//                iconFile.set(icon)
+//            }
+//            windows{
+//                iconFile.set(icon)
+//            }
         }
     }
 }
