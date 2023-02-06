@@ -65,10 +65,10 @@ suspend fun downloadYt(){
     try {
         Logger.debug("download data")
         status = "download data"
-        val client = HttpClient(Apache){
-            install(Logging){
+        val client = HttpClient(CIO){
+            /*install(Logging){
                 level = LogLevel.INFO
-            }
+            }*/
         }
         val response = client.get("$webApi?key=$keyApi&q=$link"){
             onDownload{ bytes, length ->
